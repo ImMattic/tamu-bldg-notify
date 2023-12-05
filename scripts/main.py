@@ -29,39 +29,39 @@ def load_json(file_path):
 
 # Function to compare data and send email if changes detected
 def compare_abbrevs(current_data, previous_data):
-    current_attributes = {}
-    previous_attributes = {}
-
-    for feature in current_data.get("features", []):
-        current_attributes = feature.get("attributes", {})
-
-    if (
-        "Abbrev" in current_attributes
-        and current_attributes["abbrev"] != previous_attributes["abbrev"]
-    ):
-        matching_attributes = current_attributes
+    if "Abbrev" in current_data and current_data["abbrev"] != previous_data["abbrev"]:
+        matching_attributes = current_data
         print(matching_attributes)
         return matching_attributes
 
 
+# Function that strips unnecessary data and returns a list of building objects
+def strip_excess_info(json_data):
+    bldg_list = []
+
+    for feature in json_data["features"]:
+        bldg_list.append(feature["attributes"])
+
+    # print(json.dumps(bldg_list, indent=2))
+    return bldg_list
+
+
 # Function that checks if any buildings were added or removed
 def check_building_count(current_data, previous_data):
-    added_objects = [obj for obj in current_data if obj not in previous_data]
-    removed_objects = [obj for obj in previous_data if obj not in current_data]
-    return added_objects, removed_objects
+    print()
 
 
-# Function to send a Teams notification via webhooks
-def teams_notification(webhook_url, message):
-    headers = {"Content-Type": "application/json"}
-    payload = {"text": message}
+# # Function to send a Teams notification via webhooks
+# def teams_notification(webhook_url, message):
+#     headers = {"Content-Type": "application/json"}
+#     payload = {"text": message}
 
-    response = requests.post(webhook_url, data=json.dumps(payload), headers=headers)
+#     response = requests.post(webhook_url, data=json.dumps(payload), headers=headers)
 
-    if response.status_code == 200:
-        print("Teams notification sent successfully")
-    else:
-        print(f"Error sending Teams notification. Status code: {response.status_code}")
+#     if response.status_code == 200:
+#         print("Teams notification sent successfully")
+#     else:
+#         print(f"Error sending Teams notification. Status code: {response.status_code}")
 
 
 # Job to run every 24 hours
@@ -70,7 +70,7 @@ def job():
     current_data = query_api()
     previous_data = load_json("./data/previous_data.json")
     # Check to make sure any buildings were removed or added
-    check_building_count(current_data, previous_data)
+    compare_abbrevs(current_data, previous_data)
 
 
 # # Schedule the job to run every 24 hours
