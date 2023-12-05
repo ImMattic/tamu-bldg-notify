@@ -5,13 +5,6 @@ import schedule
 import time
 import textwrap
 
-# # Schedule the job to run every 24 hours
-# schedule.every(24).hours.do(job)
-
-# while True:
-#     schedule.run_pending()
-#     time.sleep(1)
-
 
 # Function to query the API
 def query_api():
@@ -260,4 +253,10 @@ def job():
     update_data_file(previous_data_file_path, query_api())
 
 
+# Schedule the job to run every 24 hours
 job()
+schedule.every(24).hours.do(job)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
