@@ -1,5 +1,5 @@
 # tamu-bldg-notify
-Sends an email to a group of users if a TAMU building abbreviation changes
+Sends a Teams message if TAMU building information changes
 
 # Edge cases considered
 1) Building(s) are added and/or removed at the same time
