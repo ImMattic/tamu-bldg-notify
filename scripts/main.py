@@ -236,9 +236,6 @@ def job():
     # Check to make sure any buildings were removed or added
     added_bldgs, removed_bldgs = check_building_count(current_data, previous_data)
 
-    print(added_bldgs)
-    print(removed_bldgs)
-
     # Filter out any added or removed buildings from their respective lists so
     # they are ignored by the abbreviation check
     filtered_current_data = filter_list(added_bldgs, previous_data)
