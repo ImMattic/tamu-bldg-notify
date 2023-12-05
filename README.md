@@ -9,4 +9,4 @@ Sends an email to a group of users if a TAMU building abbreviation changes
 # Feature to-do
 1) Weekly/daily digest
 2) Notify chat if API server is unreachable
-3) Rotating list of 
+3) Rotating list of engineers
