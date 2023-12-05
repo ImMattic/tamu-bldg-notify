@@ -10,3 +10,6 @@ Sends a Teams message if TAMU building information changes
 1) Weekly/daily digest
 2) Notify chat if API server is unreachable
 3) Rotating list of engineers
+
+#NOTE
+You must add your own webhook_url.txt file to the ./data/ directory with your Teams webhook URL inside for this to work.
