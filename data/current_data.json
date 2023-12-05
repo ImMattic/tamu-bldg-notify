@@ -3826,28 +3826,6 @@
      },
      {
       "attributes": {
-       "OBJECTID": 638,
-       "Number": "0954",
-       "Abbrev": "AGRL",
-       "Private": "No",
-       "Type": "ACADEMIC",
-       "Bldg": "0954",
-       "Bldg_Number": "0954",
-       "BldgAbbr": "AGRL",
-       "BldgName": "Agronomy Field Lab",
-       "IsBldg": "Y",
-       "YearBuilt": "1952",
-       "NumFloors": "01",
-       "Address": "285 Agronomy Rd",
-       "City": "College Station",
-       "Zip": "77843",
-       "Zip_Actual": "77845",
-       "Shape_Length": 282.30212121378042,
-       "Shape_Area": 1481.2364493294056
-      }
-     },
-     {
-      "attributes": {
        "OBJECTID": 645,
        "Number": "0447",
        "Abbrev": "ASTO",
@@ -3980,9 +3958,9 @@
      },
      {
       "attributes": {
-       "OBJECTID": 1256,
+       "OBJECTID": 654,
        "Number": "0290",
-       "Abbrev": "XYZ",
+       "Abbrev": "WELL",
        "Private": "No",
        "Type": "HOUSING TAMU",
        "Bldg": "0290",
@@ -4066,28 +4044,6 @@
        "Shape_Area": 1309.3077609109387
       }
      },
-     {
-        "attributes": {
-         "OBJECTID": 658,
-         "Number": "0428",
-         "Abbrev": "ABCD",
-         "Private": "No",
-         "Type": "HOUSING TAMU",
-         "Bldg": "0428",
-         "Bldg_Number": "0428",
-         "BldgAbbr": "KEAT",
-         "BldgName": "Keathley Residence Hall",
-         "IsBldg": "Y",
-         "YearBuilt": "1966",
-         "NumFloors": "05",
-         "Address": "214 University Dr",
-         "City": "College Station",
-         "Zip": "77843",
-         "Zip_Actual": "77840",
-         "Shape_Length": 222.58310440983723,
-         "Shape_Area": 1309.3077609109387
-        }
-    },
      {
       "attributes": {
        "OBJECTID": 659,
@@ -7716,6 +7672,28 @@
        "Zip_Actual": "77807",
        "Shape_Length": 481.96573875574069,
        "Shape_Area": 7676.1334760372374
+      }
+     },
+     {
+      "attributes": {
+       "OBJECTID": 1371,
+       "Number": "3194",
+       "Abbrev": "KAMU",
+       "Private": "No",
+       "Type": "UNIVERSITY",
+       "Bldg": "3194",
+       "Bldg_Number": "3194",
+       "BldgAbbr": null,
+       "BldgName": "KAMU Technical Operations Building",
+       "IsBldg": "Y",
+       "YearBuilt": null,
+       "NumFloors": "01",
+       "Address": "556 Floriculture Rd",
+       "City": "College Station",
+       "Zip": "77843",
+       "Zip_Actual": "77840",
+       "Shape_Length": 88.021583259064627,
+       "Shape_Area": 475.87398540820737
       }
      },
      {

@@ -3,7 +3,7 @@ Sends an email to a group of users if a TAMU building abbreviation changes
 
 # Edge cases considered
 1) Building(s) are added or removed at the same time
-2) Any buildings added or removed are ignored from 
+2) Any buildings added or removed are ignored from the abbreviation check
 
 # Feature to-do
 1) Weekly/daily digest object

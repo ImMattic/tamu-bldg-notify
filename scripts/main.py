@@ -28,8 +28,23 @@ def load_json(file_path):
 
 
 # Function to compare data and send email if changes detected
-def compare_abbrevs(current_data, previous_data, added_bldgs: list, removed_bldgs):
-    print()
+def compare_abbrevs(current_data, previous_data):
+    previous_bldg_info = []
+    current_bldg_info = []
+    # Compare abbreviations
+    for current_obj in current_data:
+        current_obj_abbrev = current_obj["Abbrev"]
+        found = False
+
+        for previous_obj in previous_data:
+            previous_obj_abbrev = previous_obj["Abbrev"]
+            if previous_obj_abbrev != current_obj_abbrev:
+                found = True
+                break
+
+        if not found:
+            current_bldg_info.append(current_obj)
+            previous_bldg_info.append(previous_obj)
 
 
 # Function that strips unnecessary data and returns a list of building objects
@@ -41,6 +56,17 @@ def strip_excess_info(json_data):
 
     # print(json.dumps(bldg_list, indent=2))
     return bldg_list
+
+
+# Function that returns a filtered list given two list and based on OBJECTID
+# First list: list of objects to be filtered out of the main list
+# Second list: the unfiltered list that is to be filtered based on the criteria
+def filter_list(criteria_list, unfiltered_list):
+    criteria_to_match = [obj["OBJECTID"] for obj in criteria_list]
+    filtered_data = [
+        item for item in unfiltered_list if item["OBJECTID"] not in criteria_to_match
+    ]
+    return filtered_data
 
 
 # Function that checks if any buildings were added or removed
@@ -102,7 +128,12 @@ def job():
     # print(json.dumps(previous_data, indent=2))
 
     # Check to make sure any buildings were removed or added
-    added_bldg, removed_bldg = check_building_count(current_data, previous_data)
+    added_bldgs, removed_bldgs = check_building_count(current_data, previous_data)
+
+    # Filter out any added or removed buildings from their respective lists so
+    # they are ignored by the abbreviation check
+    filtered_previous_data = filter_list(removed_bldgs, previous_data)
+    filtered_current_data = filter_list(added_bldgs, current_data)
 
 
 # # Schedule the job to run every 24 hours
