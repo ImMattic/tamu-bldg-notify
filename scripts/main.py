@@ -109,22 +109,24 @@ def check_building_count(current_data, previous_data):
     return added_bldgs, removed_bldgs
 
 
+# Function that creates the text block that will be sent out via the webhook
 def message_creation(added_bldgs, removed_bldgs, current_bldg_data, previous_bldg_data):
-    added_building_text_blocks = ["Buildings added (%i):\n" % len(added_bldgs)]
-    removed_building_text_blocks = ["Buildings removed (%i):\n" % len(removed_bldgs)]
-    abbrev_change_text_blocks = [
-        "Building abbreviations changed (%i):\n" % len(current_bldg_data)
+    added_building_text_blocks = ["<br><b>Buildings added (%i):</b>" % len(added_bldgs)]
+    removed_building_text_blocks = [
+        "<br><b>Buildings removed (%i):</b>" % len(removed_bldgs)
     ]
-    teams_msg = ""
+    abbrev_change_text_blocks = [
+        "<br><b>Building abbreviations changed (%i):</b>" % len(current_bldg_data)
+    ]
+    teams_msg = "The campus building info has changed! <br>"
 
     for obj in added_bldgs:
         text_block = textwrap.dedent(
-            """\
-        Name: %s
-        Building number: %s
-        Buidling abbreviation: %s
-        Address: %s, %s, TX, %s
-
+            """
+        <blockquote><ul><li>Name: %s</li>
+        <li>Building number: %s</li>
+        <li>Buidling abbreviation: %s</li>
+        <li>Address: %s, %s, TX, %s</li></ul></blockquote>
         """
             % (
                 obj["BldgName"],
@@ -139,12 +141,11 @@ def message_creation(added_bldgs, removed_bldgs, current_bldg_data, previous_bld
 
     for obj in removed_bldgs:
         text_block = textwrap.dedent(
-            """\
-        Name: %s
-        Building number: %s
-        Buidling abbreviation: %s
-        Address: %s, %s, TX, %s
-
+            """
+        <blockquote><ul><li>Name: %s</li>
+        <li>Building number: %s</li>
+        <li>Buidling abbreviation: %s</li>
+        <li>Address: %s, %s, TX, %s</li></ul></blockquote>
         """
             % (
                 obj["BldgName"],
@@ -160,19 +161,18 @@ def message_creation(added_bldgs, removed_bldgs, current_bldg_data, previous_bld
     index = 0
     for obj in current_bldg_data:
         text_block = textwrap.dedent(
-            """\
-        Name: %s
-        Building number: %s
-        Old buidling abbreviation: %s
-        New building abbreviation: %s
-        Address: %s, %s, TX, %s
-
+            """
+        <blockquote><ul><li>Name: %s</li>
+        <li>Building number: %s</li>
+        <li>Old buidling abbreviation: %s</li>
+        <li>New building abbreviation: %s</li>
+        <li>Address: %s, %s, TX, %s</li></ul></blockquote>
         """
             % (
                 obj["BldgName"],
                 obj["Number"],
-                obj["Abbrev"],
                 previous_bldg_data[index]["Abbrev"],
+                obj["Abbrev"],
                 obj["Address"],
                 obj["City"],
                 obj["Zip"],
@@ -190,28 +190,28 @@ def message_creation(added_bldgs, removed_bldgs, current_bldg_data, previous_bld
     if len(current_bldg_data) > 0:
         teams_msg += "".join(abbrev_change_text_blocks)
 
-    print(teams_msg)
+    return teams_msg
 
 
 # # Function to send a Teams notification via webhooks
-# def teams_notification(webhook_url, message):
-#     headers = {"Content-Type": "application/json"}
-#     payload = {"text": message}
+def teams_notification(webhook_url, message):
+    headers = {"Content-Type": "application/json"}
+    payload = {"text": message}
 
-#     response = requests.post(webhook_url, data=json.dumps(payload), headers=headers)
+    response = requests.post(webhook_url, data=json.dumps(payload), headers=headers)
 
-#     if response.status_code == 200:
-#         print("Teams notification sent successfully")
-#     else:
-#         print(f"Error sending Teams notification. Status code: {response.status_code}")
+    if response.status_code == 200:
+        print("Teams notification sent successfully")
+    else:
+        print(f"Error sending Teams notification. Status code: {response.status_code}")
 
 
 # Job to run every 24 hours
 def job():
     # Get current and previous data
-    current_data = strip_excess_info(query_api())
-    # current_data = strip_excess_info(load_json("./data/previous_data.json"))
-    previous_data = strip_excess_info(load_json("./data/current_data.json"))
+    # current_data = strip_excess_info(query_api())
+    current_data = strip_excess_info(load_json("./data/current_data.json"))
+    previous_data = strip_excess_info(load_json("./data/previous_data.json"))
     # print(json.dumps(previous_data, indent=2))
 
     # Check to make sure any buildings were removed or added
@@ -219,13 +219,26 @@ def job():
 
     # Filter out any added or removed buildings from their respective lists so
     # they are ignored by the abbreviation check
-    filtered_previous_data = filter_list(added_bldgs, previous_data)
-    filtered_current_data = filter_list(removed_bldgs, current_data)
+    filtered_previous_data = filter_list(removed_bldgs, previous_data)
+    filtered_current_data = filter_list(added_bldgs, current_data)
     current_bldg_info, previous_bldg_info = compare_abbrevs(
         filtered_current_data, filtered_previous_data
     )
 
-    message_creation(added_bldgs, removed_bldgs, current_bldg_info, previous_bldg_info)
+    # Creates the Teams message that will be sent out via the webhook
+    teams_msg = message_creation(
+        added_bldgs, removed_bldgs, current_bldg_info, previous_bldg_info
+    )
+
+    # Send out Teams message
+    if len(current_bldg_info) > 0 or len(added_bldgs) > 0 or len(removed_bldgs) > 0:
+        webhook_url = ""
+        with open("./data/webhook_url.txt") as file:
+            webhook_url = file.read().rstrip()
+        print(teams_msg)
+        teams_notification(webhook_url, teams_msg)
+
+    # TODO: Update previous_data with the most current data from API
 
 
 # # Schedule the job to run every 24 hours

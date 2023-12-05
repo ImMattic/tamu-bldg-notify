@@ -7588,9 +7588,9 @@
      },
      {
       "attributes": {
-       "OBJECTID": 1360,
+       "OBJECTID": 2555,
        "Number": "8084",
-       "Abbrev": "Hangar 5",
+       "Abbrev": "iaojgoiajg",
        "Private": "No",
        "Type": "RESEARCH",
        "Bldg": "8084",
@@ -7634,7 +7634,7 @@
       "attributes": {
        "OBJECTID": 1364,
        "Number": "1344",
-       "Abbrev": "BACF",
+       "Abbrev": "ABCD",
        "Private": "No",
        "Type": "ACADEMIC",
        "Bldg": "1344",
@@ -7722,7 +7722,7 @@
       "attributes": {
        "OBJECTID": 1372,
        "Number": "1523",
-       "Abbrev": "BEC",
+       "Abbrev": "TEST",
        "Private": "No",
        "Type": "ACADEMIC",
        "Bldg": "1523",
