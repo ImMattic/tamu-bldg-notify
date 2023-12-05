@@ -38,13 +38,17 @@ def compare_abbrevs(current_data, previous_data):
 
         for previous_obj in previous_data:
             previous_obj_abbrev = previous_obj["Abbrev"]
-            if previous_obj_abbrev != current_obj_abbrev:
+            if previous_obj_abbrev == current_obj_abbrev:
                 found = True
                 break
 
         if not found:
             current_bldg_info.append(current_obj)
             previous_bldg_info.append(previous_obj)
+
+    print(current_bldg_info)
+    print(previous_bldg_info)
+    return current_bldg_info, previous_bldg_info
 
 
 # Function that strips unnecessary data and returns a list of building objects
@@ -134,6 +138,7 @@ def job():
     # they are ignored by the abbreviation check
     filtered_previous_data = filter_list(removed_bldgs, previous_data)
     filtered_current_data = filter_list(added_bldgs, current_data)
+    compare_abbrevs(filtered_current_data, filtered_previous_data)
 
 
 # # Schedule the job to run every 24 hours

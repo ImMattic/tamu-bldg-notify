@@ -3826,6 +3826,28 @@
      },
      {
       "attributes": {
+       "OBJECTID": 638,
+       "Number": "0954",
+       "Abbrev": "AGRL",
+       "Private": "No",
+       "Type": "ACADEMIC",
+       "Bldg": "0954",
+       "Bldg_Number": "0954",
+       "BldgAbbr": "AGRL",
+       "BldgName": "Agronomy Field Lab",
+       "IsBldg": "Y",
+       "YearBuilt": "1952",
+       "NumFloors": "01",
+       "Address": "285 Agronomy Rd",
+       "City": "College Station",
+       "Zip": "77843",
+       "Zip_Actual": "77845",
+       "Shape_Length": 282.30212121378042,
+       "Shape_Area": 1481.2364493294056
+      }
+     },
+     {
+      "attributes": {
        "OBJECTID": 645,
        "Number": "0447",
        "Abbrev": "ASTO",
@@ -7700,7 +7722,7 @@
       "attributes": {
        "OBJECTID": 1372,
        "Number": "1523",
-       "Abbrev": "BEC",
+       "Abbrev": "ABCD",
        "Private": "No",
        "Type": "ACADEMIC",
        "Bldg": "1523",
