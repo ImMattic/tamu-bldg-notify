@@ -98,7 +98,7 @@ def check_building_count(current_data, previous_data):
                 break
 
         if not found:
-            removed_bldgs.append(current_obj)
+            added_bldgs.append(current_obj)
 
     # Check for added buildings in current_data comapred to previous_data
     for previous_obj in previous_data:
@@ -112,7 +112,7 @@ def check_building_count(current_data, previous_data):
                 break
 
         if not found:
-            added_bldgs.append(previous_obj)
+            removed_bldgs.append(previous_obj)
     return added_bldgs, removed_bldgs
 
 
@@ -200,7 +200,7 @@ def message_creation(added_bldgs, removed_bldgs, current_bldg_data, previous_bld
     return teams_msg
 
 
-# # Function to send a Teams notification via webhooks
+# Function to send a Teams notification via webhooks
 def teams_notification(webhook_url, message):
     headers = {"Content-Type": "application/json"}
     payload = {"text": message}
@@ -213,6 +213,7 @@ def teams_notification(webhook_url, message):
         print(f"Error sending Teams notification. Status code: {response.status_code}")
 
 
+# Updates the data file with the latest one from the API
 def update_data_file(file_path, new_data):
     try:
         with open(file_path, "w") as file:
@@ -235,10 +236,13 @@ def job():
     # Check to make sure any buildings were removed or added
     added_bldgs, removed_bldgs = check_building_count(current_data, previous_data)
 
+    print(added_bldgs)
+    print(removed_bldgs)
+
     # Filter out any added or removed buildings from their respective lists so
     # they are ignored by the abbreviation check
-    filtered_previous_data = filter_list(added_bldgs, previous_data)
-    filtered_current_data = filter_list(removed_bldgs, current_data)
+    filtered_current_data = filter_list(added_bldgs, previous_data)
+    filtered_previous_data = filter_list(removed_bldgs, current_data)
     current_bldg_info, previous_bldg_info = compare_abbrevs(
         filtered_current_data, filtered_previous_data
     )
@@ -253,7 +257,6 @@ def job():
         webhook_url = ""
         with open("./data/webhook_url.txt") as file:
             webhook_url = file.read().rstrip()
-        print(teams_msg)
         teams_notification(webhook_url, teams_msg)
 
     # TODO: Update previous_data with the most current data from API
