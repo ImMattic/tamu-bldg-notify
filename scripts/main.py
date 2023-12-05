@@ -5,6 +5,13 @@ import schedule
 import time
 import textwrap
 
+# # Schedule the job to run every 24 hours
+# schedule.every(24).hours.do(job)
+
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)
+
 
 # Function to query the API
 def query_api():
@@ -206,12 +213,23 @@ def teams_notification(webhook_url, message):
         print(f"Error sending Teams notification. Status code: {response.status_code}")
 
 
+def update_data_file(file_path, new_data):
+    try:
+        with open(file_path, "w") as file:
+            json.dump(new_data, file, indent=2)
+        print(f"Data updated successfully in {file_path}")
+    except Exception as e:
+        print(f"Error updating data file: {e}")
+
+
 # Job to run every 24 hours
 def job():
+    previous_data_file_path = "./data/previous_data.json"
     # Get current and previous data
-    # current_data = strip_excess_info(query_api())
-    current_data = strip_excess_info(load_json("./data/current_data.json"))
-    previous_data = strip_excess_info(load_json("./data/previous_data.json"))
+    current_data = strip_excess_info(query_api())
+    # current_data = strip_excess_info(load_json("./data/current_data.json"))
+
+    previous_data = strip_excess_info(load_json(previous_data_file_path))
     # print(json.dumps(previous_data, indent=2))
 
     # Check to make sure any buildings were removed or added
@@ -219,8 +237,8 @@ def job():
 
     # Filter out any added or removed buildings from their respective lists so
     # they are ignored by the abbreviation check
-    filtered_previous_data = filter_list(removed_bldgs, previous_data)
-    filtered_current_data = filter_list(added_bldgs, current_data)
+    filtered_previous_data = filter_list(added_bldgs, previous_data)
+    filtered_current_data = filter_list(removed_bldgs, current_data)
     current_bldg_info, previous_bldg_info = compare_abbrevs(
         filtered_current_data, filtered_previous_data
     )
@@ -239,13 +257,7 @@ def job():
         teams_notification(webhook_url, teams_msg)
 
     # TODO: Update previous_data with the most current data from API
+    update_data_file(previous_data_file_path, query_api())
 
-
-# # Schedule the job to run every 24 hours
-# schedule.every(24).hours.do(job)
-
-# while True:
-#     schedule.run_pending()
-#     time.sleep(1)
 
 job()
