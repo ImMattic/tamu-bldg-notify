@@ -3,6 +3,7 @@ import json
 from datetime import datetime, timedelta
 import schedule
 import time
+import textwrap
 
 
 # Function to query the API
@@ -31,6 +32,7 @@ def load_json(file_path):
 def compare_abbrevs(current_data, previous_data):
     previous_bldg_info = []
     current_bldg_info = []
+    index = 0
     # Compare abbreviations
     for current_obj in current_data:
         current_obj_abbrev = current_obj["Abbrev"]
@@ -44,10 +46,9 @@ def compare_abbrevs(current_data, previous_data):
 
         if not found:
             current_bldg_info.append(current_obj)
-            previous_bldg_info.append(previous_obj)
+            previous_bldg_info.append(previous_data[index])
+        index += 1
 
-    print(current_bldg_info)
-    print(previous_bldg_info)
     return current_bldg_info, previous_bldg_info
 
 
@@ -66,11 +67,11 @@ def strip_excess_info(json_data):
 # First list: list of objects to be filtered out of the main list
 # Second list: the unfiltered list that is to be filtered based on the criteria
 def filter_list(criteria_list, unfiltered_list):
-    criteria_to_match = [obj["OBJECTID"] for obj in criteria_list]
-    filtered_data = [
-        item for item in unfiltered_list if item["OBJECTID"] not in criteria_to_match
-    ]
-    return filtered_data
+    filtered_list = []
+    for obj in unfiltered_list:
+        if obj["OBJECTID"] not in [c_obj["OBJECTID"] for c_obj in criteria_list]:
+            filtered_list.append(obj)
+    return filtered_list
 
 
 # Function that checks if any buildings were added or removed
@@ -105,8 +106,91 @@ def check_building_count(current_data, previous_data):
 
         if not found:
             added_bldgs.append(previous_obj)
-
     return added_bldgs, removed_bldgs
+
+
+def message_creation(added_bldgs, removed_bldgs, current_bldg_data, previous_bldg_data):
+    added_building_text_blocks = ["Buildings added (%i):\n" % len(added_bldgs)]
+    removed_building_text_blocks = ["Buildings removed (%i):\n" % len(removed_bldgs)]
+    abbrev_change_text_blocks = [
+        "Building abbreviations changed (%i):\n" % len(current_bldg_data)
+    ]
+    teams_msg = ""
+
+    for obj in added_bldgs:
+        text_block = textwrap.dedent(
+            """\
+        Name: %s
+        Building number: %s
+        Buidling abbreviation: %s
+        Address: %s, %s, TX, %s
+
+        """
+            % (
+                obj["BldgName"],
+                obj["Number"],
+                obj["Abbrev"],
+                obj["Address"],
+                obj["City"],
+                obj["Zip"],
+            )
+        )
+        added_building_text_blocks.append(text_block)
+
+    for obj in removed_bldgs:
+        text_block = textwrap.dedent(
+            """\
+        Name: %s
+        Building number: %s
+        Buidling abbreviation: %s
+        Address: %s, %s, TX, %s
+
+        """
+            % (
+                obj["BldgName"],
+                obj["Number"],
+                obj["Abbrev"],
+                obj["Address"],
+                obj["City"],
+                obj["Zip"],
+            )
+        )
+        removed_building_text_blocks.append(text_block)
+
+    index = 0
+    for obj in current_bldg_data:
+        text_block = textwrap.dedent(
+            """\
+        Name: %s
+        Building number: %s
+        Old buidling abbreviation: %s
+        New building abbreviation: %s
+        Address: %s, %s, TX, %s
+
+        """
+            % (
+                obj["BldgName"],
+                obj["Number"],
+                obj["Abbrev"],
+                previous_bldg_data[index]["Abbrev"],
+                obj["Address"],
+                obj["City"],
+                obj["Zip"],
+            )
+        )
+        abbrev_change_text_blocks.append(text_block)
+        index += 1
+
+    if len(added_bldgs) > 0:
+        teams_msg += "".join(added_building_text_blocks)
+
+    if len(removed_bldgs) > 0:
+        teams_msg += "".join(removed_building_text_blocks)
+
+    if len(current_bldg_data) > 0:
+        teams_msg += "".join(abbrev_change_text_blocks)
+
+    print(teams_msg)
 
 
 # # Function to send a Teams notification via webhooks
@@ -128,7 +212,6 @@ def job():
     current_data = strip_excess_info(query_api())
     # current_data = strip_excess_info(load_json("./data/previous_data.json"))
     previous_data = strip_excess_info(load_json("./data/current_data.json"))
-
     # print(json.dumps(previous_data, indent=2))
 
     # Check to make sure any buildings were removed or added
@@ -136,9 +219,13 @@ def job():
 
     # Filter out any added or removed buildings from their respective lists so
     # they are ignored by the abbreviation check
-    filtered_previous_data = filter_list(removed_bldgs, previous_data)
-    filtered_current_data = filter_list(added_bldgs, current_data)
-    compare_abbrevs(filtered_current_data, filtered_previous_data)
+    filtered_previous_data = filter_list(added_bldgs, previous_data)
+    filtered_current_data = filter_list(removed_bldgs, current_data)
+    current_bldg_info, previous_bldg_info = compare_abbrevs(
+        filtered_current_data, filtered_previous_data
+    )
+
+    message_creation(added_bldgs, removed_bldgs, current_bldg_info, previous_bldg_info)
 
 
 # # Schedule the job to run every 24 hours
