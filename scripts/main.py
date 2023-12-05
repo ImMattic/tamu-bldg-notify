@@ -28,11 +28,8 @@ def load_json(file_path):
 
 
 # Function to compare data and send email if changes detected
-def compare_abbrevs(current_data, previous_data):
-    if "Abbrev" in current_data and current_data["abbrev"] != previous_data["abbrev"]:
-        matching_attributes = current_data
-        print(matching_attributes)
-        return matching_attributes
+def compare_abbrevs(current_data, previous_data, added_bldgs: list, removed_bldgs):
+    print()
 
 
 # Function that strips unnecessary data and returns a list of building objects
@@ -48,7 +45,38 @@ def strip_excess_info(json_data):
 
 # Function that checks if any buildings were added or removed
 def check_building_count(current_data, previous_data):
-    print()
+    added_bldgs = []
+    removed_bldgs = []
+
+    # Check for removed objects in current_data compared to previous_data
+    for current_obj in current_data:
+        current_obj_id = current_obj["OBJECTID"]
+        found = False
+
+        for previous_obj in previous_data:
+            previous_obj_id = previous_obj["OBJECTID"]
+            if previous_obj_id == current_obj_id:
+                found = True
+                break
+
+        if not found:
+            removed_bldgs.append(current_obj)
+
+    # Check for added buildings in current_data comapred to previous_data
+    for previous_obj in previous_data:
+        previous_obj_id = previous_obj["OBJECTID"]
+        found = False
+
+        for current_obj in current_data:
+            current_obj_id = current_obj["OBJECTID"]
+            if current_obj_id == previous_obj_id:
+                found = True
+                break
+
+        if not found:
+            added_bldgs.append(previous_obj)
+
+    return added_bldgs, removed_bldgs
 
 
 # # Function to send a Teams notification via webhooks
@@ -67,10 +95,14 @@ def check_building_count(current_data, previous_data):
 # Job to run every 24 hours
 def job():
     # Get current and previous data
-    current_data = query_api()
-    previous_data = load_json("./data/previous_data.json")
+    current_data = strip_excess_info(query_api())
+    # current_data = strip_excess_info(load_json("./data/previous_data.json"))
+    previous_data = strip_excess_info(load_json("./data/current_data.json"))
+
+    # print(json.dumps(previous_data, indent=2))
+
     # Check to make sure any buildings were removed or added
-    compare_abbrevs(current_data, previous_data)
+    added_bldg, removed_bldg = check_building_count(current_data, previous_data)
 
 
 # # Schedule the job to run every 24 hours
