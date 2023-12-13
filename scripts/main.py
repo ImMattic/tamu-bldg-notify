@@ -248,7 +248,7 @@ def job():
             webhook_url = file.read().rstrip()
         teams_notification(webhook_url, teams_msg)
 
-    # TODO: Update previous_data with the most current data from API
+    # Update previous_data with the most current data from API
     update_data_file(previous_data_file_path, query_api())
 
 
